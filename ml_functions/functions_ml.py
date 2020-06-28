@@ -472,7 +472,61 @@ def randomforest_classifier(**parameters):
 
 # rank features
 
+def getFeatureImportance(model, X_train, canal):
+    features = pd.DataFrame()
+    features['feature'] = X_train.columns
+    features['importance'] = model.feature_importances_
+    ftrs = features.sort_values(by = ['importance','feature'], ascending=False)
+    ftrs = ftrs.reset_index(drop = True)
+    plt.figure(figsize=(12,25))
+    
+    ax = sns.barplot("importance", "feature", data = ftrs[ftrs.importance>0.009])
+    
+    plt.ylabel("Variables Relevantes", fontsize = 24, color = "white" )
+    plt.xlabel("Importancia (Frecuencia)", fontsize = 24, color = "white")
+    plt.show()
+    
+    name_fil = 'FeatureImportance_{}.png'.format(canal)
+    plt.savefig(name_fil, bbox_inches = 'tight', transparent = True) 
+    return ftrs, name_fil
 
+
+
+def rmsle_score(y_test, y_pred):
+    result = np.sqrt(mean_squared_log_error(y_test, y_pred))
+    return result
+
+
+def report_nulls(df_input):
+    tab_info = pd.DataFrame(df_input.dtypes).T.rename(index={0:'column Type'}) 
+    tab_info = tab_info.append(pd.DataFrame(df_input.isnull().sum()).T.rename(index={0:'null values (nb)'}))
+    tab_info = tab_info.append(pd.DataFrame(df_input.isnull().sum()/df_input.shape[0]*100).T.
+                                           rename(index={0: 'null values (%)'}))
+    return tab_info
+
+def get_unique(series):
+    series  = series.astype(str)
+    uniques =  np.unique(series)
+    return len(uniques)
+
+def getFirst(series):
+    val = 0
+    try:
+        val = series.values[0]
+    except:
+#         print(series)
+#         print("except")
+#         sys.exit(0)
+        val = np.nan
+    return val
+
+def getLast(series):
+    val = 0
+    try:
+        val = series.values[-1] 
+    except:    
+        val = np.nan
+    return val
 
 
 
